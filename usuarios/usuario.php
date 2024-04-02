@@ -1,9 +1,45 @@
 <?php
 require_once "../utils/conexion.php";
-if($_SERVER['REQUEST_METHOD']==="GET"){
-    ;
-   }
-elseif($_SERVER['REQUEST_METHOD']==="POST"){
+if ($_SERVER['REQUEST_METHOD'] === "GET") {
+    
+    $nombre_usuario = isset($_GET['nombre']) ? $_GET['nombre'] : null;
+    
+    
+    if ($nombre_usuario !== null) {
+        
+        $sql = "SELECT * FROM usuarios WHERE nombre_usuario = '$nombre_usuario'";
+        $result = $conexion->query($sql);
+
+        if ($result->num_rows > 0) {
+            
+            while ($row = $result->fetch_assoc()) {
+                echo "Nombre: " . $row["nombre_usuario"] . "<br>";
+                echo "Puntuacion: " . $row["puntuacion"] . "<br>";
+
+                
+                $usuario_id = $row["id_usuario"];
+                $sql_mensajes = "SELECT * FROM mensajes WHERE id_usuario = '$usuario_id'";
+                $result_mensajes = $conexion->query($sql_mensajes);
+
+                if ($result_mensajes->num_rows > 0) {
+                    
+                    while ($row_mensaje = $result_mensajes->fetch_assoc()) {
+                        echo "Mensaje: " . $row_mensaje["contenido"] ."<br>".  "Canal " . $row_mensaje["id_canal"] . "<br>";
+                        
+                    }
+                } else {
+                    echo "El usuario no tiene mensajes.";
+                }
+            }
+        } else {
+            echo "Usuario no encontrado.";
+        }
+    } else {
+        
+        header("HTTP/1.1 400 Bad Request");
+        echo '{"error": "Nombre de usuario no proporcionado"}';
+    }
+} elseif($_SERVER['REQUEST_METHOD']==="POST"){
     $nombre = isset($_POST['nombre']) ? $_POST['nombre'] : null;
     $rol = isset($_POST['rol']) ? $_POST['rol'] : null;
 
